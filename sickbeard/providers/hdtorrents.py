@@ -42,7 +42,6 @@ class HDTorrentsProvider(generic.TorrentProvider):
     urls = {'base_url' : 'https://hdts.ru/index.php',
             'login' : 'https://hdts.ru/login.php',
             'detail' : 'https://www.hdts.ru/details.php?id=%s',
-            'search' : 'https://hdts.ru/torrents.php?search=%s&active=1&options=0%s',
             'download' : 'https://www.sceneaccess.eu/%s',
             'home' : 'https://www.hdts.ru/%s'
             }
@@ -195,12 +194,12 @@ class HDTorrentsProvider(generic.TorrentProvider):
                     #Get first entry in table
                     entries = html.find_all('td', attrs={'align' : 'center'})
 
-                    if not entries:
+                    if len(entries) < 22:
                         logger.log(u"The Data returned from " + self.name + " do not contains any torrent", logger.DEBUG)
                         continue
 
                     try:
-                        title = entries[22].find('a')['title'].strip('History - ').replace('Blu-ray', 'bd50')
+                        title = entries[22].find('a')['title'].replace('History - ', '').replace('Blu-ray', 'bd50')
                         url = self.urls['home'] % entries[15].find('a')['href']
                         download_url = self.urls['home'] % entries[15].find('a')['href']
                         id = entries[23].find('div')['id']
@@ -238,10 +237,10 @@ class HDTorrentsProvider(generic.TorrentProvider):
                         cells = block2.find_all('td')
                         
                         try:
-                            title = cells[1].find('b').get_text().strip('\t ').replace('Blu-ray', 'bd50')
+                            title = cells[2].find('b').get_text().strip('\t ').replace('Blu-ray', 'bd50')
                             url = self.urls['home'] % cells[4].find('a')['href']
                             download_url = self.urls['home'] % cells[4].find('a')['href']
-                            detail = cells[1].find('a')['href']
+                            detail = cells[2].find('a')['href']
                             id = detail.replace('details.php?id=', '')
                             seeders = int(cells[9].get_text())
                             leechers = int(cells[10].get_text())
